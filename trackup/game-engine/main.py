@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
-import aioredis
+import redis.asyncio as aioredis
 import uuid
 import os
 from enum import Enum

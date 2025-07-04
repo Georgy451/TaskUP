@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Body, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
-import aioredis
+import redis.asyncio as aioredis
 import uuid
 import os
 from typing import Optional
@@ -8,6 +8,7 @@ from enum import Enum
 from datetime import datetime
 import asyncio
 import httpx
+import json
 
 app = FastAPI()
 
@@ -71,7 +72,17 @@ async def create_room(room: RoomCreate):
     redis = app.state.redis
     room_id = str(uuid.uuid4())
     room_data = Room(id=room_id, name=room.name, creator=room.creator)
-    await redis.hset(f"room:{room_id}", mapping=room_data.dict())
+    import json
+    data = room_data.dict()
+    for k, v in data.items():
+        if v is None:
+            data[k] = ""
+        elif isinstance(v, (list, dict)):
+            data[k] = json.dumps(v)
+        else:
+            data[k] = str(v)
+    print("DEBUG: data for redis.hset:", data)
+    await redis.hset(f"room:{room_id}", mapping=data)
     await redis.expire(f"room:{room_id}", 1800)  # TTL 30 мин
     return room_data
 
