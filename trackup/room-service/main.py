@@ -15,7 +15,7 @@ app = FastAPI()
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 USER_SERVICE_URL = os.getenv("USER_SERVICE_URL", "http://localhost:8001")
 
-# Модель комнаты
+
 class RoomState(str, Enum):
     waiting = "waiting"
     started = "started"
@@ -28,7 +28,7 @@ class Room(BaseModel):
     participants: list[str] = []
     state: RoomState = RoomState.waiting
 
-# Схема для создания комнаты
+
 class RoomCreate(BaseModel):
     name: str
     creator: str
