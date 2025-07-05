@@ -40,3 +40,46 @@
 .read-the-docs {
   color: #888;
 }
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  background: rgba(30, 32, 40, 0.95);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  padding: 40px 24px;
+  margin: 40px auto;
+  max-width: 400px;
+}
+
+.home-container h1 {
+  color: #fff;
+  font-size: 2.2rem;
+  margin-bottom: 2.5rem;
+  letter-spacing: 1px;
+}
+
+.home-container button {
+  background: linear-gradient(90deg, #646cff 0%, #61dafb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(100, 108, 255, 0.15);
+}
+
+.home-container button:hover {
+  background: linear-gradient(90deg, #61dafb 0%, #646cff 100%);
+  transform: translateY(-2px) scale(1.04);
+}
+
+.home-container a {
+  text-decoration: none;
+}
