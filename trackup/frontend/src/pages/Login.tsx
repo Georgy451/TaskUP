@@ -1,16 +1,22 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
 const Login = () => {
   return (
-    <div className="auth-container">
-      <h2>Вход</h2>
-      <form>
-        <input type="text" placeholder="Имя пользователя" required />
-        <input type="password" placeholder="Пароль" required />
-        <button type="submit">Войти</button>
-      </form>
-      <p>Нет аккаунта? <Link to="/register">Зарегистрироваться</Link></p>
+    <div className="home-animated-bg">
+      <div className="home-glass">
+        <h2 className="home-title">Вход</h2>
+        <form className="auth-form">
+          <input type="text" placeholder="Имя пользователя" required className="auth-input" />
+          <input type="password" placeholder="Пароль" required className="auth-input" />
+          <button type="submit" className="home-btn">Войти</button>
+        </form>
+        <p className="auth-link">Нет аккаунта? <Link to="/register">Зарегистрироваться</Link></p>
+      </div>
+      <ul className="bg-bubbles">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <li key={i}></li>
+        ))}
+      </ul>
     </div>
   );
 };

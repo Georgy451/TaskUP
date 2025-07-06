@@ -40,11 +40,6 @@ class RoomStateUpdate(BaseModel):
     state: RoomState
     user: str
 
-class ChatMessage(BaseModel):
-    user: str
-    message: str
-    timestamp: float = None
-
 class GameEvent(BaseModel):
     type: str 
     payload: dict
@@ -138,48 +133,6 @@ async def get_room(room_id: str):
         raise HTTPException(status_code=404, detail="Room not found")
     room["participants"] = eval(room.get("participants", "[]"))
     return Room(**room)
-
-@app.post("/rooms/{room_id}/chat/send")
-async def send_chat_message(room_id: str, msg: ChatMessage):
-    redis = app.state.redis
-    key = f"room:{room_id}:chat"
-    msg.timestamp = msg.timestamp or datetime.utcnow().timestamp()
-    await redis.rpush(key, msg.json())
-    await redis.publish(f"room:{room_id}:chat:pubsub", msg.json())
-    # Храним только последние 100 сообщений
-    await redis.ltrim(key, -100, -1)
-    return {"detail": "Message sent"}
-
-@app.get("/rooms/{room_id}/chat/messages")
-async def get_chat_messages(room_id: str, limit: int = 30):
-    redis = app.state.redis
-    key = f"room:{room_id}:chat"
-    messages = await redis.lrange(key, -limit, -1)
-    return [ChatMessage.parse_raw(m) for m in messages]
-
-@app.websocket("/ws/rooms/{room_id}/chat")
-async def websocket_room_chat(websocket: WebSocket, room_id: str):
-    await websocket.accept()
-    redis = app.state.redis
-    pubsub = redis.pubsub()
-    channel = f"room:{room_id}:chat:pubsub"
-    await pubsub.subscribe(channel)
-    try:
-        while True:
-            msg = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
-            if msg and msg["type"] == "message":
-                await websocket.send_text(msg["data"])
-            try:
-                data = await asyncio.wait_for(websocket.receive_text(), timeout=0.1)
-                # Клиент может отправлять сообщения через WebSocket (опционально)
-                await redis.rpush(f"room:{room_id}:chat", data)
-                await redis.publish(channel, data)
-                await redis.ltrim(f"room:{room_id}:chat", -100, -1)
-            except asyncio.TimeoutError:
-                continue
-    except WebSocketDisconnect:
-        await pubsub.unsubscribe(channel)
-        await pubsub.close()
 
 @app.post("/rooms/{room_id}/game/event")
 async def send_game_event(room_id: str, event: GameEvent):
