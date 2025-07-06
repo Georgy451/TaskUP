@@ -68,9 +68,19 @@ const GameProcess = () => {
     setTimeout(()=>setShowConfetti(false), 1700);
   };
 
+  // Заглушка для завершения игры
+  const finishGame = () => {
+    alert('Игра завершена!');
+    // Здесь можно добавить вызов API для завершения игры
+  };
+
   return (
     <div className="game-list-bg">
       <Confetti show={showConfetti} />
+      {/* Кнопка завершения игры */}
+      <button className="home-btn" style={{position:'absolute',top:24,right:24,zIndex:1000}} onClick={finishGame}>
+        Завершить игру
+      </button>
       <div className="game-list-container">
         <div className="game-players-row">
           {mockPlayers.map((name, i) => (
@@ -82,7 +92,7 @@ const GameProcess = () => {
             </div>
           ))}
         </div>
-        <div className="game-task-list">
+        <div className="game-task-list" style={{minHeight:220, minWidth:1100, maxWidth:'98vw'}}>
           {mode === null ? (
             <div className="game-choice-btns-row">
               <button className="home-btn game-choice-btn" onClick={chooseTruth} style={{order:1}}>Правда</button>

@@ -656,7 +656,9 @@ body, html, #root {
   min-width: 1100px;
   max-width: 98vw;
   min-height: 220px;
-  margin: 0 auto;
+  height: 260px; /* фиксированная высота для одинакового окна */
+  box-sizing: border-box;
+  justify-content: center;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -666,8 +668,19 @@ body, html, #root {
 @media (max-width: 1200px) {
   .game-task-list {
     min-width: 0;
+    height: auto;
+    min-height: 180px;
     padding: 18px 4vw 18px 4vw;
   }
+}
+
+.game-task-list > * {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .game-task-title {
@@ -877,4 +890,62 @@ body, html, #root {
   font-weight: 700;
   letter-spacing: 1px;
   margin-top: 0.7rem;
+}
+
+@media (max-width: 600px) {
+  html, body, #root {
+    font-size: 15px;
+    min-width: 100vw;
+    min-height: 100vh;
+    padding: 0;
+    margin: 0;
+    overflow-x: hidden;
+  }
+  .home-glass, .features-glass, .profile-page-glass, .modal-window, .game-task-list {
+    min-width: 0 !important;
+    max-width: 98vw !important;
+    width: 98vw !important;
+    padding: 12px 2vw 12px 2vw !important;
+    box-sizing: border-box;
+  }
+  .game-list-container, .game-list-bg, .features-bg, .profile-page-bg {
+    min-width: 100vw;
+    width: 100vw;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .game-task-list {
+    min-width: 0 !important;
+    padding: 12px 2vw 12px 2vw !important;
+    min-height: 120px;
+    height: auto;
+  }
+  .game-task-text {
+    font-size: 1.05rem;
+    padding: 10px 2vw;
+    min-width: 0;
+    min-height: 60px;
+  }
+  .game-choice-btns-row {
+    gap: 10px;
+    margin: 10px 0 8px 0;
+  }
+  .game-choice-btn {
+    font-size: 1.1rem;
+    padding: 0.7rem 0.7rem;
+    min-width: 90px;
+    min-height: 38px;
+    border-radius: 12px;
+  }
+  .home-btn, .profile-link-btn {
+    font-size: 1rem;
+    padding: 0.7rem 1.1rem;
+    border-radius: 14px;
+  }
+  .game-player-card {
+    min-width: 70px;
+    min-height: 32px;
+    font-size: 0.95rem;
+    padding: 10px 10px;
+  }
 }
