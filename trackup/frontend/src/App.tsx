@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import Home from "./pages/Home";
 import Features from "./pages/Features";
 import GameProcess from "./pages/GameProcess";
+import Profile from "./pages/Profile";
 import "./App.css";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/features" element={<Features />} />
         <Route path="/game" element={<GameProcess />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

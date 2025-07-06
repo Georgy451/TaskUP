@@ -61,6 +61,12 @@ const Features = () => {
             Подключиться к комнате
           </button>
         </form>
+        <div className="profile-link-bar-bottom">
+          <button className="profile-link-btn" onClick={() => window.location.href = '/profile'}>
+            <span role="img" aria-label="profile" style={{fontSize: '1.3em', marginRight: 6}}>&#128100;</span>
+            Профиль
+          </button>
+        </div>
       </div>
       {showModal && (
         <div className="modal-bg" onClick={handleModalClose}>
