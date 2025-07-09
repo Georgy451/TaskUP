@@ -31,6 +31,17 @@ async def proxy_room(request: Request, path: str):
         )
         return JSONResponse(status_code=resp.status_code, content=resp.json())
 
+@app.api_route("/api/rooms{path:path}", methods=["GET", "POST", "DELETE", "PUT", "PATCH"])
+async def proxy_room_api(request: Request, path: str):
+    async with httpx.AsyncClient() as client:
+        resp = await client.request(
+            method=request.method,
+            url=room_url(path),
+            headers=request.headers.raw,
+            content=await request.body()
+        )
+        return JSONResponse(status_code=resp.status_code, content=resp.json())
+
 @app.api_route("/game{path:path}", methods=["GET", "POST", "DELETE", "PUT", "PATCH"])
 async def proxy_game(request: Request, path: str):
     async with httpx.AsyncClient() as client:

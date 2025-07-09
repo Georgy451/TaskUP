@@ -11,6 +11,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 import os
 
 app = FastAPI()
@@ -38,9 +39,9 @@ async def register_user(user: schemas.UserCreate, db: AsyncSession = Depends(dat
 
 @app.post("/login", response_model=schemas.Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(database.get_db)):
-    query = models.User.__table__.select().where(models.User.username == form_data.username)
+    query = select(models.User).where(models.User.username == form_data.username)
     result = await db.execute(query)
-    user = result.scalar()
+    user = result.scalars().first()
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { createRoom } from "../api/rooms";
 
 const MODES = [
   { value: "classic", label: "Классический" },
@@ -12,6 +14,7 @@ const Features = () => {
   const [mode, setMode] = useState(MODES[0].value);
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
+  const navigate = useNavigate();
 
   const handleCreate = () => {
     setShowModal(true);
@@ -24,10 +27,19 @@ const Features = () => {
     setRoomCode("");
   };
 
-  const handleModalSubmit = (e: React.FormEvent) => {
+  const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Создана комната: ${roomName}\nКод: ${roomCode}\nРежим: ${mode}`);
-    handleModalClose();
+    try {
+      // creator можно заменить на имя пользователя из auth, если есть
+      await createRoom(roomName, "creator", mode);
+      setShowModal(false);
+      setRoomName("");
+      setMode(MODES[0].value);
+      setRoomCode("");
+      navigate("/game");
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   const handleJoin = (e: React.FormEvent) => {

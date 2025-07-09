@@ -2,8 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 import os
 
-# Явно указываем IPv4 localhost
-DATABASE_URL = "postgresql+asyncpg://postgres:postgres@127.0.0.1:5432/postgres"
+# Строка подключения теперь совпадает с alembic.ini
+DATABASE_URL = "postgresql+asyncpg://home:georgdobriy222222@localhost:5432/FastAPI"
 print(f"[DEBUG] DATABASE_URL used for connection: {DATABASE_URL}")
 
 engine = create_async_engine(DATABASE_URL, echo=True)

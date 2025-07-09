@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 import models
 import schemas
 from passlib.context import CryptContext
@@ -11,12 +12,12 @@ def get_user_by_username(db: Session, username: str):
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()
 
-def create_user(db: Session, user: schemas.UserCreate):
+async def create_user(db: AsyncSession, user: schemas.UserCreate):
     hashed_password = pwd_context.hash(user.password)
     db_user = models.User(username=user.username, email=user.email, hashed_password=hashed_password)
     db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
+    await db.commit()
+    await db.refresh(db_user)
     return db_user
 
 def authenticate_user(db: Session, username: str, password: str):
