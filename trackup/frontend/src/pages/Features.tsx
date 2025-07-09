@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createRoom } from "../api/rooms";
+import { joinRoom } from "../api/game";
+import { getUserFromCookie } from "../utils/getUserFromCookie";
 
 const MODES = [
   { value: "classic", label: "Классический" },
@@ -14,6 +16,7 @@ const Features = () => {
   const [mode, setMode] = useState(MODES[0].value);
   const [roomCode, setRoomCode] = useState("");
   const [joinCode, setJoinCode] = useState("");
+  const [username, setUsername] = useState(() => getUserFromCookie() || "");
   const navigate = useNavigate();
 
   const handleCreate = () => {
@@ -31,7 +34,7 @@ const Features = () => {
     e.preventDefault();
     try {
       // creator можно заменить на имя пользователя из auth, если есть
-      await createRoom(roomName, "creator", mode);
+      await createRoom(roomCode, roomName, "creator", mode);
       setShowModal(false);
       setRoomName("");
       setMode(MODES[0].value);
@@ -42,9 +45,19 @@ const Features = () => {
     }
   };
 
-  const handleJoin = (e: React.FormEvent) => {
+  const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(`Подключиться к комнате: ${joinCode} (реализуйте API-запрос)`);
+    try {
+      let name = username.trim();
+      if (!name) {
+        name = getUserFromCookie() || `Гость_${Math.floor(Math.random()*10000)}`;
+      }
+      await joinRoom(joinCode, name);
+      alert(`Вы успешно подключились к комнате: ${joinCode}`);
+      // Здесь можно добавить переход на страницу игры
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   return (

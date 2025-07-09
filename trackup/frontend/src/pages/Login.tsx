@@ -16,6 +16,8 @@ const Login = () => {
     try {
       const data = await loginUser(username, password);
       setSuccess("Вход выполнен! Токен: " + data.access_token);
+      // Сохраняем имя пользователя в cookie на 7 дней
+      document.cookie = `username=${encodeURIComponent(username)}; path=/; max-age=${7*24*60*60}`;
       // Можно сохранить токен в localStorage, если нужно
       setTimeout(() => navigate("/features"), 500); // редирект через 0.5 сек
     } catch (err: any) {

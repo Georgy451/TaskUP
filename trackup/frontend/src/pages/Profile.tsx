@@ -1,4 +1,5 @@
 import React, { useRef, useState } from "react";
+import { getUserFromCookie } from "../utils/getUserFromCookie";
 
 const Profile = () => {
   // Здесь можно получить данные пользователя из стора/контекста
@@ -10,6 +11,7 @@ const Profile = () => {
 
   const [avatar, setAvatar] = useState("https://ui-avatars.com/api/?name=Георгий&background=6c63ff&color=fff&size=128");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const username = getUserFromCookie() || "Гость";
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -27,7 +29,7 @@ const Profile = () => {
   return (
     <div className="profile-page-bg">
       <div className="profile-page-glass">
-        <div className="profile-page-info-name">Георгий</div>
+        <div className="profile-page-info-name">{username}</div>
         <img src={avatar} alt="avatar" className="profile-avatar-large" />
         <input
           type="file"

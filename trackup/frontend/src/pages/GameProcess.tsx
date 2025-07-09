@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getParticipants } from "../api/participants";
 
-const mockPlayers = [
-  "Анна", "Борис", "Вика", "Глеб", "Даша"
-];
 const mockTruth = [
   "Расскажи свой секрет!",
   "Кого ты считаешь своим лучшим другом?",
@@ -43,15 +41,25 @@ function Confetti({show}:{show:boolean}) {
 }
 
 const GameProcess = () => {
+  const [participants, setParticipants] = useState<string[]>([]);
   const [current, setCurrent] = useState(0);
   const [task, setTask] = useState("");
   const [mode, setMode] = useState<"truth"|"dare"|null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  // Получаем room_id из localStorage или query-параметра (добавь свою логику)
+  const room_id = localStorage.getItem("room_id") || "";
+
+  useEffect(() => {
+    if (room_id) {
+      getParticipants(room_id).then(setParticipants);
+    }
+  }, [room_id]);
+
   const nextTurn = () => {
     setMode(null);
     setTask("");
-    setCurrent((current + 1) % mockPlayers.length);
+    setCurrent((current + 1) % participants.length);
     setShowConfetti(false);
   };
 
@@ -83,7 +91,7 @@ const GameProcess = () => {
       </button>
       <div className="game-list-container">
         <div className="game-players-row">
-          {mockPlayers.map((name, i) => (
+          {participants.map((name, i) => (
             <div
               key={name}
               className={`game-player-card${i === current ? " active" : ""}`}

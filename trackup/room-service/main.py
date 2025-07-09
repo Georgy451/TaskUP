@@ -5,6 +5,7 @@ import uuid
 import os
 from enum import Enum
 from datetime import datetime
+import json
 
 app = FastAPI()
 
@@ -24,6 +25,7 @@ class Room(BaseModel):
     state: RoomState = RoomState.waiting
 
 class RoomCreate(BaseModel):
+    id: str  # теперь пользователь вводит id (код комнаты)
     name: str
     creator: str
     mode: str
@@ -39,19 +41,29 @@ async def shutdown():
 @app.post("/rooms", response_model=Room)
 async def create_room(room: RoomCreate):
     redis = app.state.redis
-    room_id = str(uuid.uuid4())
-    room_data = Room(id=room_id, name=room.name, creator=room.creator, mode=room.mode)
-    await redis.hset(f"room:{room_id}", mapping=room_data.dict())
-    await redis.expire(f"room:{room_id}", 1800)  # TTL 30 мин
+    # Проверяем, что такой код комнаты ещё не занят
+    exists = await redis.exists(f"room:{room.id}")
+    if exists:
+        raise HTTPException(status_code=400, detail="Код комнаты уже занят")
+    # Преобразуем список участников в строку для Redis
+    room_dict = Room(id=room.id, name=room.name, creator=room.creator, mode=room.mode).dict()
+    room_dict["participants"] = json.dumps(room_dict["participants"], ensure_ascii=False)
+    await redis.hset(f"room:{room.id}", mapping=room_dict)
+    await redis.expire(f"room:{room.id}", 1800)  # TTL 30 мин
     # Создаём игровую сессию сразу при создании комнаты
     session = {
-        "room_id": room_id,
+        "room_id": room.id,
         "name": room.name,
         "mode": room.mode,
-        "participants": str(room_data.participants),
-        "state": room_data.state.value,
+        "participants": room_dict["participants"],
+        "state": room_dict["state"],
         "created_at": datetime.utcnow().timestamp()
     }
-    await redis.hset(f"game_session:{room_id}", mapping=session)
-    await redis.expire(f"game_session:{room_id}", 1800)
-    return room_data
+    await redis.hset(f"game_session:{room.id}", mapping=session)
+    await redis.expire(f"game_session:{room.id}", 1800)
+    print("Возвращаем room_data:", json.dumps(room_dict, ensure_ascii=False))
+    try:
+        return Room(**{**room_dict, "participants": []})
+    except Exception as e:
+        print("Ошибка при возврате room_data:", e)
+        raise HTTPException(status_code=500, detail=f"Ошибка сериализации: {e}")
