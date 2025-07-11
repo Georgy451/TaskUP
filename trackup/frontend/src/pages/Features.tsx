@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createRoom } from "../api/rooms";
-import { joinRoom } from "../api/game";
 import { getUserFromCookie } from "../utils/getUserFromCookie";
 
 const MODES = [
@@ -14,9 +13,7 @@ const Features = () => {
   const [showModal, setShowModal] = useState(false);
   const [roomName, setRoomName] = useState("");
   const [mode, setMode] = useState(MODES[0].value);
-  const [roomCode, setRoomCode] = useState("");
-  const [joinCode, setJoinCode] = useState("");
-  const [username, setUsername] = useState(() => getUserFromCookie() || "");
+  const [participants, setParticipants] = useState<string[]>([""]);
   const navigate = useNavigate();
 
   const handleCreate = () => {
@@ -27,37 +24,42 @@ const Features = () => {
     setShowModal(false);
     setRoomName("");
     setMode(MODES[0].value);
-    setRoomCode("");
+    setParticipants([""]);
   };
 
   const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // creator можно заменить на имя пользователя из auth, если есть
-      await createRoom(roomCode, roomName, "creator", mode);
+      const filtered = participants.map(p => p.trim()).filter(Boolean);
+      if (filtered.length === 0) {
+        alert("Добавьте хотя бы одного участника!");
+        return;
+      }
+      await createRoom(roomName, filtered, mode);
       setShowModal(false);
       setRoomName("");
       setMode(MODES[0].value);
-      setRoomCode("");
+      setParticipants([""]);
       navigate("/game");
     } catch (err: any) {
       alert(err.message);
     }
   };
 
-  const handleJoin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      let name = username.trim();
-      if (!name) {
-        name = getUserFromCookie() || `Гость_${Math.floor(Math.random()*10000)}`;
-      }
-      await joinRoom(joinCode, name);
-      alert(`Вы успешно подключились к комнате: ${joinCode}`);
-      // Здесь можно добавить переход на страницу игры
-    } catch (err: any) {
-      alert(err.message);
-    }
+  const handleParticipantChange = (i: number, value: string) => {
+    setParticipants(prev => {
+      const arr = [...prev];
+      arr[i] = value;
+      return arr;
+    });
+  };
+
+  const handleAddParticipant = () => {
+    setParticipants(prev => [...prev, ""]);
+  };
+
+  const handleRemoveParticipant = (i: number) => {
+    setParticipants(prev => prev.length > 1 ? prev.filter((_, idx) => idx !== i) : prev);
   };
 
   return (
@@ -70,22 +72,6 @@ const Features = () => {
           </span>{" "}
           Создать комнату
         </button>
-        <form className="auth-form join-room-animated" onSubmit={handleJoin}>
-          <input
-            className="auth-input"
-            type="text"
-            placeholder="Код комнаты"
-            value={joinCode}
-            onChange={e => setJoinCode(e.target.value)}
-            required
-          />
-          <button className="home-btn" type="submit">
-            <span style={{ display: "inline-block", transition: "transform 0.2s" }}>
-              &#128273;
-            </span>{" "}
-            Подключиться к комнате
-          </button>
-        </form>
         <div className="profile-link-bar-bottom">
           <button className="profile-link-btn" onClick={() => window.location.href = '/profile'}>
             <span role="img" aria-label="profile" style={{fontSize: '1.3em', marginRight: 6}}>&#128100;</span>
@@ -116,14 +102,24 @@ const Features = () => {
                   <option key={m.value} value={m.value}>{m.label}</option>
                 ))}
               </select>
-              <input
-                className="auth-input"
-                type="text"
-                placeholder="Код комнаты"
-                value={roomCode}
-                onChange={e => setRoomCode(e.target.value)}
-                required
-              />
+              <div style={{marginTop: 12}}>
+                <label style={{fontWeight: 500}}>Участники:</label>
+                {participants.map((p, i) => (
+                  <div key={i} style={{display: 'flex', alignItems: 'center', marginBottom: 6}}>
+                    <input
+                      className="auth-input"
+                      type="text"
+                      placeholder={`Имя участника ${i+1}`}
+                      value={p}
+                      onChange={e => handleParticipantChange(i, e.target.value)}
+                      required
+                      style={{flex: 1}}
+                    />
+                    <button type="button" className="home-btn" style={{marginLeft: 8, padding: '2px 8px'}} onClick={() => handleRemoveParticipant(i)} disabled={participants.length === 1}>–</button>
+                  </div>
+                ))}
+                <button type="button" className="home-btn" style={{marginTop: 4}} onClick={handleAddParticipant}>Добавить участника</button>
+              </div>
               <div className="modal-btns">
                 <button className="home-btn" type="submit">Создать</button>
                 <button className="home-btn" type="button" onClick={handleModalClose} style={{background: '#888', marginLeft: 12}}>Отмена</button>

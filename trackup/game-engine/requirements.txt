@@ -1,4 +1,0 @@
-fastapi
-redis>=4.2.0
-uvicorn
-pydantic
