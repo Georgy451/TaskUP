@@ -1,6 +1,6 @@
 // API для создания комнаты
 export async function createRoom(name: string, participants: string[], mode: string) {
-  const res = await fetch('/api/rooms', {
+  const res = await fetch('http://localhost:8002/rooms', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, participants, mode }),

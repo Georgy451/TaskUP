@@ -6,8 +6,17 @@ import os
 from enum import Enum
 from datetime import datetime
 import json
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Можно указать конкретный адрес фронта
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
