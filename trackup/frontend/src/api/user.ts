@@ -1,6 +1,6 @@
 // API-модуль для работы с пользователями
 export async function registerUser(username: string, email: string, password: string) {
-  const res = await fetch('/api/register', {
+  const res = await fetch('http://localhost:8001/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, email, password }),
@@ -17,7 +17,7 @@ export async function loginUser(username: string, password: string) {
   params.append('username', username);
   params.append('password', password);
   // OAuth2PasswordRequestForm требует Content-Type: application/x-www-form-urlencoded
-  const res = await fetch('/api/login', {
+  const res = await fetch('http://localhost:8001/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params.toString(),

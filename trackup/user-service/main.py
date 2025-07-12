@@ -13,8 +13,16 @@ from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Можно указать конкретные адреса, например ["http://localhost:5173"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 SECRET_KEY = os.getenv("SECRET_KEY", "your_secret_key")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
